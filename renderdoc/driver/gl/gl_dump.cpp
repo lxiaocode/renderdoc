@@ -62,7 +62,7 @@ void GLDump::ResetFrameData()
 {
   if (m_current_frame == 0)
     StartDumper();
-  if (m_current_frame >= MAXFRAMES)
+  if (m_current_frame >= MAXFRAMES - 1)
     return;
   if (m_current_frame >= 0)
   {

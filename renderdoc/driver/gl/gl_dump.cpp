@@ -37,7 +37,6 @@ void GLDump::Dumper()
       for (; serialized < d2s; serialized++)
       {
         file << m_framedatas[serialized].drawcall_count << " ";
-        //std::cout << GLDump::Inst().m_framedatas[serialized].drawcall_count << " ";
       }
       file << std::endl;
       //std::cout << std::endl;
@@ -63,9 +62,11 @@ void GLDump::ResetFrameData()
 {
   if (m_current_frame == 0)
     StartDumper();
+  if (m_current_frame >= MAXFRAMES)
+    return;
   if (m_current_frame >= 0)
   {
-    //RDCLOG("frame %d, drawcall %d", m_current_frame, m_current_framedata->drawcall_count);
+    RDCLOG("frame %d, drawcall %d", m_current_frame, m_current_framedata->drawcall_count);
     if ((m_current_frame % 500) == 0)
     {
       RDCLOG("Writing ...");

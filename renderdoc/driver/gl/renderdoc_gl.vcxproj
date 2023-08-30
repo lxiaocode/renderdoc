@@ -106,6 +106,7 @@
     <ClInclude Include="glx_dispatch_table.h" />
     <ClInclude Include="gl_common.h" />
     <ClInclude Include="gl_driver.h" />
+    <ClInclude Include="gl_dump.h" />
     <ClInclude Include="gl_enum.h" />
     <ClInclude Include="gl_dispatch_table.h" />
     <ClInclude Include="gl_dispatch_table_defs.h" />
@@ -152,6 +153,7 @@
     <ClCompile Include="gl_counters.cpp" />
     <ClCompile Include="gl_debug.cpp" />
     <ClCompile Include="gl_driver.cpp" />
+    <ClCompile Include="gl_dump.cpp" />
     <ClCompile Include="gl_hooks.cpp" />
     <ClCompile Include="gl_pixelhistory.cpp" />
     <ClCompile Include="wgl_hooks.cpp" />

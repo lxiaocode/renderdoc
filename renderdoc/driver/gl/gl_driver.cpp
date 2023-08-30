@@ -30,6 +30,8 @@
 #include "jpeg-compressor/jpge.h"
 #include "serialise/rdcfile.h"
 #include "strings/string_utils.h"
+
+#include "gl_dump.h"
 #include "gl_replay.h"
 
 std::map<uint64_t, GLWindowingData> WrappedOpenGL::m_ActiveContexts;
@@ -1992,6 +1994,7 @@ void WrappedOpenGL::RefreshDerivedReplacements()
 
 void WrappedOpenGL::SwapBuffers(WindowingSystem winSystem, void *windowHandle)
 {
+  GLDump::Ints()->ResetFrameData();
   if(IsBackgroundCapturing(m_State))
     RenderDoc::Inst().Tick();
 

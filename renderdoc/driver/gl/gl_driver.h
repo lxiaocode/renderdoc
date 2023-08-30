@@ -34,8 +34,10 @@
 #include "gl_manager.h"
 #include "gl_renderstate.h"
 #include "gl_resources.h"
+#include "gl_dump.h"
 
 class GLReplay;
+class GLDump;
 
 namespace glslang
 {
@@ -153,7 +155,6 @@ private:
   bool m_MarkedActive = false;
 
   bool m_UsesVRMarkers;
-
   GLReplay *m_Replay = NULL;
   RDCDriver m_DriverType;
 

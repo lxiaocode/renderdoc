@@ -24,6 +24,8 @@ set(sources
     gl_renderstate.h
     gl_replay.cpp
     gl_replay.h
+	gl_dump.cpp
+	gl_dump.h
     gl_resources.cpp
     gl_resources.h
     gl_program_iterate.cpp

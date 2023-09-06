@@ -565,6 +565,8 @@ void WrappedOpenGL::glFramebufferTexture2D(GLenum target, GLenum attachment, GLe
     if(texture != 0 && GetResourceManager()->HasResourceRecord(TextureRes(GetCtx(), texture)))
     {
       GetResourceManager()->MarkDirtyResource(TextureRes(GetCtx(), texture));
+      GLResourceRecord *texr = GetResourceManager()->GetResourceRecord(TextureRes(GetCtx(), texture));
+      GLDump::Ints()->RecordFrameBufferTexture(this, record->GetResourceID(), texr->GetResourceID());
     }
 
     if(m_HighTrafficResources.find(record->GetResourceID()) != m_HighTrafficResources.end() &&
@@ -1589,6 +1591,10 @@ void WrappedOpenGL::glBindFramebuffer(GLenum target, GLuint framebuffer)
   if(target == eGL_READ_FRAMEBUFFER || target == eGL_FRAMEBUFFER)
     GetCtxData().m_ReadFramebufferRecord =
         GetResourceManager()->GetResourceRecord(FramebufferRes(GetCtx(), framebuffer));
+  if (GetCtxData().m_DrawFramebufferRecord)
+  {
+    GLDump::Ints()->RecordFrameBuffer(this, GetCtxData().m_DrawFramebufferRecord->GetResourceID());
+  }
 }
 
 template <typename SerialiserType>

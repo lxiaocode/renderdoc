@@ -1183,7 +1183,7 @@ void WrappedOpenGL::glDrawArrays(GLenum mode, GLint first, GLsizei count)
   }
 
   SERIALISE_TIME_CALL(GL.glDrawArrays(mode, first, count));
-  GLDump::Ints()->AccDrawcall();
+  GLDump::Ints()->RecordDrawcall();
 
   if(IsActiveCapturing(m_State))
   {
@@ -1268,7 +1268,7 @@ void WrappedOpenGL::glDrawArraysIndirect(GLenum mode, const void *indirect)
   }
 
   SERIALISE_TIME_CALL(GL.glDrawArraysIndirect(mode, indirect));
-  GLDump::Ints()->AccDrawcall();
+  GLDump::Ints()->RecordDrawcall();
 
   if(IsActiveCapturing(m_State))
   {
@@ -1339,7 +1339,7 @@ void WrappedOpenGL::glDrawArraysInstanced(GLenum mode, GLint first, GLsizei coun
   }
 
   SERIALISE_TIME_CALL(GL.glDrawArraysInstanced(mode, first, count, instancecount));
-  GLDump::Ints()->AccDrawcall();
+  GLDump::Ints()->RecordDrawcall();
 
   if(IsActiveCapturing(m_State))
   {
@@ -1498,7 +1498,7 @@ void WrappedOpenGL::glDrawElements(GLenum mode, GLsizei count, GLenum type, cons
   }
 
   SERIALISE_TIME_CALL(GL.glDrawElements(mode, count, type, indices));
-  GLDump::Ints()->AccDrawcall();
+  GLDump::Ints()->RecordDrawcall();
 
   if(IsActiveCapturing(m_State))
   {
@@ -1588,7 +1588,7 @@ void WrappedOpenGL::glDrawElementsIndirect(GLenum mode, GLenum type, const void 
   }
 
   SERIALISE_TIME_CALL(GL.glDrawElementsIndirect(mode, type, indirect));
-  GLDump::Ints()->AccDrawcall();
+  GLDump::Ints()->RecordDrawcall();
 
   if(IsActiveCapturing(m_State))
   {
@@ -1665,7 +1665,7 @@ void WrappedOpenGL::glDrawRangeElements(GLenum mode, GLuint start, GLuint end, G
   }
 
   SERIALISE_TIME_CALL(GL.glDrawRangeElements(mode, start, end, count, type, indices));
-  GLDump::Ints()->AccDrawcall();
+  GLDump::Ints()->RecordDrawcall();
 
   if(IsActiveCapturing(m_State))
   {
@@ -1830,7 +1830,7 @@ void WrappedOpenGL::glDrawElementsBaseVertex(GLenum mode, GLsizei count, GLenum 
   }
 
   SERIALISE_TIME_CALL(GL.glDrawElementsBaseVertex(mode, count, type, indices, basevertex));
-  GLDump::Ints()->AccDrawcall();
+  GLDump::Ints()->RecordDrawcall();
 
   if(IsActiveCapturing(m_State))
   {
@@ -1910,7 +1910,7 @@ void WrappedOpenGL::glDrawElementsInstanced(GLenum mode, GLsizei count, GLenum t
   }
 
   SERIALISE_TIME_CALL(GL.glDrawElementsInstanced(mode, count, type, indices, instancecount));
-  GLDump::Ints()->AccDrawcall();
+  GLDump::Ints()->RecordDrawcall();
 
   if(IsActiveCapturing(m_State))
   {
@@ -2319,7 +2319,7 @@ void WrappedOpenGL::glMultiDrawArrays(GLenum mode, const GLint *first, const GLs
   }
 
   SERIALISE_TIME_CALL(GL.glMultiDrawArrays(mode, first, count, drawcount));
-  GLDump::Ints()->AccDrawcall();
+  GLDump::Ints()->RecordDrawcall();
 
   if(IsActiveCapturing(m_State))
   {
@@ -2487,7 +2487,7 @@ void WrappedOpenGL::glMultiDrawElements(GLenum mode, const GLsizei *count, GLenu
   }
 
   SERIALISE_TIME_CALL(GL.glMultiDrawElements(mode, count, type, indices, drawcount));
-  GLDump::Ints()->AccDrawcall();
+  GLDump::Ints()->RecordDrawcall();
 
   if(IsActiveCapturing(m_State))
   {
@@ -2877,7 +2877,7 @@ void WrappedOpenGL::glMultiDrawArraysIndirect(GLenum mode, const void *indirect,
   }
 
   SERIALISE_TIME_CALL(GL.glMultiDrawArraysIndirect(mode, indirect, drawcount, stride));
-  GLDump::Ints()->AccDrawcall();
+  GLDump::Ints()->RecordDrawcall();
 
   if(IsActiveCapturing(m_State))
   {
@@ -3104,7 +3104,7 @@ void WrappedOpenGL::glMultiDrawElementsIndirect(GLenum mode, GLenum type, const 
   }
 
   SERIALISE_TIME_CALL(GL.glMultiDrawElementsIndirect(mode, type, indirect, drawcount, stride));
-  GLDump::Ints()->AccDrawcall();
+  GLDump::Ints()->RecordDrawcall();
 
   if(IsActiveCapturing(m_State))
   {

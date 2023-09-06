@@ -303,7 +303,7 @@ void WrappedOpenGL::glBindTexture(GLenum target, GLuint texture)
   if(IsCaptureMode(m_State))
   {
     GLResourceRecord *r = GetResourceManager()->GetResourceRecord(TextureRes(GetCtx(), texture));
-    GLDump::Ints()->AccTexture(this, r->GetResourceID());
+    GLDump::Ints()->RecordTexture(this, r->GetResourceID());
 
     if(r == NULL)
     {
@@ -7008,6 +7008,9 @@ void WrappedOpenGL::glTextureBuffer(GLuint texture, GLenum internalformat, GLuin
 void WrappedOpenGL::glTexBuffer(GLenum target, GLenum internalformat, GLuint buffer)
 {
   SERIALISE_TIME_CALL(GL.glTexBuffer(target, internalformat, buffer));
+  ResourceId bufid = GetResourceManager()->GetResID(BufferRes(GetCtx(), buffer));
+  GLResourceRecord *record = GetCtxData().GetActiveTexRecord(target);
+  GLDump::Ints()->CacheBufferTextureMemory(this, record->GetResourceID(), bufid);
 
   // saves on queries of the currently bound texture to this target, as we don't have records on
   // replay

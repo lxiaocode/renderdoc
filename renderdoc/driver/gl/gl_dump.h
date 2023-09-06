@@ -35,29 +35,44 @@ public:
 
   void StartDumper();
 
-  void AccDrawcall();
+  void RecordDrawcall();
 
   // =========================================================
   // Texture
   // =========================================================
-  void AccTexture(WrappedOpenGL *m_pDriver, ResourceId id);
+  void RecordTexture(WrappedOpenGL *m_pDriver, ResourceId id);
   
-  void CacheTextureMemory(WrappedOpenGL *m_pDriver, ResourceId record, GLenum target, GLsizei levels,
+  void CacheTextureMemory(WrappedOpenGL *m_pDriver, ResourceId id, GLenum target, GLsizei levels,
                                         GLenum internalformat, GLsizei width, GLsizei height, GLsizei depth);
+
+  void CacheBufferTextureMemory(WrappedOpenGL *m_pDriver, ResourceId id, ResourceId bufid);
 
   static size_t CalcTextureMemory(GLsizei w, GLsizei h, GLsizei d, GLenum internalformat, uint32_t levels);
 
   size_t CalcTextureTotalMemory();
 
+  // =========================================================
+  // Frame Buffer
+  // =========================================================
+  void RecordFrameBufferTexture(WrappedOpenGL *m_pDriver, ResourceId id, ResourceId texid);
+  void RecordFrameBuffer(WrappedOpenGL *m_pDriver, ResourceId id);
 
+  // =========================================================
+  // Buffer
+  // =========================================================
+  void RecordBuffer(WrappedOpenGL *m_pDriver, ResourceId id);
 
+  void CacheBufferMemory(WrappedOpenGL *m_pDriver, ResourceId record, GLsizeiptr size);
+
+  size_t CalcBufferTotalMemory();
+
+  
   void ResetFrameData(WrappedOpenGL *m_pDriver, size_t backbufferColorSize);
   
 private:
   GLDump();
   virtual ~GLDump() {}
   std::thread writerThread;
-  std::map<ResourceId, TextureDescription> m_CachedTextures;
 
 public:
   int m_current_frame = -1;
@@ -65,5 +80,8 @@ public:
   FrameData m_framedatas[MAXFRAMES];
   FrameData *m_current_framedata;
   std::set<ResourceId> textures;
+  std::map<ResourceId, std::set<ResourceId>> framebufferTextures;
   std::map<ResourceId, size_t> textureUsage;
+  std::set<ResourceId> buffers;
+  std::map<ResourceId, size_t> bufferUsage;
 };

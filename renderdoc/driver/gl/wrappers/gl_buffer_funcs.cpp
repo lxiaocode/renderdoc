@@ -324,6 +324,7 @@ void WrappedOpenGL::glBindBuffer(GLenum target, GLuint buffer)
   {
     GLResourceRecord *r = cd.m_BufferRecord[idx] =
         GetResourceManager()->GetResourceRecord(BufferRes(GetCtx(), buffer));
+    GLDump::Ints()->RecordBuffer(this, r->GetResourceID());
 
     if(!r)
     {
@@ -815,6 +816,7 @@ void WrappedOpenGL::glBufferData(GLenum target, GLsizeiptr size, const void *dat
   }
 
   SERIALISE_TIME_CALL(GL.glBufferData(target, size, data, usage));
+  GLDump::Ints()->CacheBufferMemory(this, GetCtxData().m_BufferRecord[idx]->GetResourceID(), size);
 
   if(IsCaptureMode(m_State))
   {

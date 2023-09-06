@@ -1994,7 +1994,6 @@ void WrappedOpenGL::RefreshDerivedReplacements()
 
 void WrappedOpenGL::SwapBuffers(WindowingSystem winSystem, void *windowHandle)
 {
-  GLDump::Ints()->ResetFrameData();
   if(IsBackgroundCapturing(m_State))
     RenderDoc::Inst().Tick();
 
@@ -2018,6 +2017,7 @@ void WrappedOpenGL::SwapBuffers(WindowingSystem winSystem, void *windowHandle)
   m_FrameCounter++;    // first present becomes frame #1, this function is at the end of the frame
 
   ContextData &ctxdata = GetCtxData();
+  GLDump::Ints()->ResetFrameData(this, ctxdata.initParams.width * ctxdata.initParams.height);
 
   // we only handle context-window associations here as it's too common to
   // create invisible helper windows while creating contexts, that then

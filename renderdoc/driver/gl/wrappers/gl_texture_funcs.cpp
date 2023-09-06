@@ -121,6 +121,7 @@ void WrappedOpenGL::glGenTextures(GLsizei n, GLuint *textures)
   for(GLsizei i = 0; i < n; i++)
   {
     GLResource res = TextureRes(GetCtx(), textures[i]);
+    //RDCLOG("RegisterResource %d", res.name);
     ResourceId id = GetResourceManager()->RegisterResource(res);
 
     if(IsCaptureMode(m_State))
@@ -231,9 +232,11 @@ void WrappedOpenGL::glDeleteTextures(GLsizei n, const GLuint *textures)
       if(GetResourceManager()->HasResourceRecord(res))
       {
         GLResourceRecord *record = GetResourceManager()->GetResourceRecord(res);
+        // RDCLOG("Delete Resource %d", record->GetResourceID().id);
         cd.ClearMatchingActiveTexRecord(record);
         record->Delete(GetResourceManager());
       }
+      //RDCLOG("UnregisterResource %d", res.name);
       GetResourceManager()->UnregisterResource(res);
     }
   }
@@ -300,6 +303,7 @@ void WrappedOpenGL::glBindTexture(GLenum target, GLuint texture)
   if(IsCaptureMode(m_State))
   {
     GLResourceRecord *r = GetResourceManager()->GetResourceRecord(TextureRes(GetCtx(), texture));
+    GLDump::Ints()->AccTexture(this, r->GetResourceID());
 
     if(r == NULL)
     {
@@ -4582,6 +4586,8 @@ void WrappedOpenGL::glTextureStorage1D(GLuint texture, GLsizei levels, GLenum in
 void WrappedOpenGL::glTexStorage1D(GLenum target, GLsizei levels, GLenum internalformat, GLsizei width)
 {
   SERIALISE_TIME_CALL(GL.glTexStorage1D(target, levels, internalformat, width));
+  GLResourceRecord *record = GetCtxData().GetActiveTexRecord(target);
+  GLDump::Ints()->CacheTextureMemory(this, record->GetResourceID(), target, levels, internalformat, width, 1, 1);
 
   // saves on queries of the currently bound texture to this target, as we don't have records on
   // replay
@@ -4711,6 +4717,8 @@ void WrappedOpenGL::glTexStorage2D(GLenum target, GLsizei levels, GLenum interna
                                    GLsizei width, GLsizei height)
 {
   SERIALISE_TIME_CALL(GL.glTexStorage2D(target, levels, internalformat, width, height));
+  GLResourceRecord *record = GetCtxData().GetActiveTexRecord(target);
+  GLDump::Ints()->CacheTextureMemory(this, record->GetResourceID(), target, levels, internalformat, width, height, 1);
 
   // saves on queries of the currently bound texture to this target, as we don't have records on
   // replay
@@ -4844,6 +4852,8 @@ void WrappedOpenGL::glTexStorage3D(GLenum target, GLsizei levels, GLenum interna
                                    GLsizei width, GLsizei height, GLsizei depth)
 {
   SERIALISE_TIME_CALL(GL.glTexStorage3D(target, levels, internalformat, width, height, depth));
+  GLResourceRecord *record = GetCtxData().GetActiveTexRecord(target);
+  GLDump::Ints()->CacheTextureMemory(this, record->GetResourceID(), target, levels, internalformat, width, height, depth);
 
   // saves on queries of the currently bound texture to this target, as we don't have records on
   // replay

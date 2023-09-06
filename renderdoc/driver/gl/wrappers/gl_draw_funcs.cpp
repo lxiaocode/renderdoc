@@ -1830,6 +1830,7 @@ void WrappedOpenGL::glDrawElementsBaseVertex(GLenum mode, GLsizei count, GLenum 
   }
 
   SERIALISE_TIME_CALL(GL.glDrawElementsBaseVertex(mode, count, type, indices, basevertex));
+  GLDump::Ints()->AccDrawcall();
 
   if(IsActiveCapturing(m_State))
   {

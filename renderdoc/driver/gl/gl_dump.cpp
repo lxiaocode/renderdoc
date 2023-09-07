@@ -109,7 +109,12 @@ void GLDump::CacheTextureMemory(WrappedOpenGL *m_pDriver, ResourceId id, GLenum 
   if (m_CacheTextures.find(id) == m_CacheTextures.end())
   {
     size_t texSize = CalcTextureMemory(width, height, depth, internalformat, levels);
-    // RDCLOG("resourceId %d, levels %d, width %d, height %d, depth %d, texSize %d", id.id, levels, width, height, depth, texSize);
+    // RDCLOG("%s, levels %d, width %d, height %d, depth %d, texSize %d", ToStr(id).c_str(), levels, width, height, depth, texSize);
+
+    if (target == eGL_TEXTURE_CUBE_MAP)
+    {
+      texSize = texSize * 6;
+    }
     m_CacheTextures.insert(std::pair<ResourceId, size_t>(id, texSize));
   }
 }
@@ -138,10 +143,13 @@ void GLDump::CacheBufferMemory(WrappedOpenGL *m_pDriver, ResourceId id, GLsizeip
 size_t GLDump::CalcTextureTotalMemory()
 {
   size_t ret = 0;
+  //RDCLOG("CalcTextureTotalMemory Start");
   for (ResourceId id : m_TmpTextures)
   {
     ret += m_CacheTextures[id];
+    //RDCLOG("%s : %d", ToStr(id).c_str(), m_CacheTextures[id]);
   }
+  //RDCLOG("CalcTextureTotalMemory End");
   return ret;
 }
 

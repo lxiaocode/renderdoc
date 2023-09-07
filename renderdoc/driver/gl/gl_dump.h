@@ -96,7 +96,7 @@ public:
 
 class GLDump
 {
-  typedef struct 
+  struct FrameData
   {
     size_t frame;
     size_t drawcall_count;
@@ -104,7 +104,17 @@ class GLDump
     size_t texture_size;
     size_t buffer_count;
     size_t buffer_size;
-  } FrameData;
+
+    void Reset()
+    {
+      frame = 0;
+      drawcall_count = 0;
+      texture_count = 0;
+      texture_size = 0;
+      buffer_count = 0;
+      buffer_size = 0;
+    }
+  };
 
 public:
   static GLDump * Ints();

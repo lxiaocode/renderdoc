@@ -181,6 +181,7 @@ void GLDump::ResetFrameData(WrappedOpenGL *m_pDriver, size_t backbufferColorSize
   m_CurrentFrame++;
   //m_CurrentFrameData = &m_framedatas[m_CurrentFrame];
   m_CurrentFrameData = m_FrameDatas->enqueueRef();
+  m_CurrentFrameData->Reset();
   m_TmpTextures.clear();
   m_TmpBuffers.clear();
 }

@@ -167,7 +167,7 @@ void GLDump::ResetFrameData(WrappedOpenGL *m_pDriver, size_t backbufferColorSize
 {
   if (m_CurrentFrame == 0)
     StartDumper();
-  if (m_CurrentFrame >= MAXFRAMES - 1)
+  if (m_FrameDatas->isFull())
     return;
   if (m_CurrentFrame > 0)
   {

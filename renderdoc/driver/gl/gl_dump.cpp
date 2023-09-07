@@ -56,34 +56,34 @@ void GLDump::StartDumper()
 /* 计算每帧 DrawCall 数量 */
 void GLDump::RecordDrawcall()
 {
-  if (m_current_framedata != NULL)
-    m_current_framedata->drawcall_count++;
+  if (m_CurrentFrameData != NULL)
+    m_CurrentFrameData->drawcall_count++;
 }
 
 /* 计算每帧 BindTexture 数量 */
 void GLDump::RecordTexture(WrappedOpenGL *m_pDriver, ResourceId id)
 {
-  if (m_current_framedata != NULL)
+  if (m_CurrentFrameData != NULL)
   {
-    textures.insert(id);
+    m_TmpTextures.insert(id);
   }
 }
 
 void GLDump::RecordFrameBufferTexture(WrappedOpenGL *m_pDriver, ResourceId id, ResourceId texid)
 {
-  if (framebufferTextures.find(id) == framebufferTextures.end())
+  if (m_CacheFrameBuffers.find(id) == m_CacheFrameBuffers.end())
   {
-    framebufferTextures.insert(std::pair<ResourceId, std::set<ResourceId>>(id, std::set<ResourceId>{texid}));
+    m_CacheFrameBuffers.insert(std::pair<ResourceId, std::set<ResourceId>>(id, std::set<ResourceId>{texid}));
   }
   else
   {
-    framebufferTextures[id].insert(texid);
+    m_CacheFrameBuffers[id].insert(texid);
   }
 }
 
 void GLDump::RecordFrameBuffer(WrappedOpenGL *m_pDriver, ResourceId id)
 {
-  for (ResourceId texid : framebufferTextures[id])
+  for (ResourceId texid : m_CacheFrameBuffers[id])
   {
     RecordTexture(m_pDriver, texid);
   }
@@ -91,69 +91,61 @@ void GLDump::RecordFrameBuffer(WrappedOpenGL *m_pDriver, ResourceId id)
 
 void GLDump::RecordBuffer(WrappedOpenGL *m_pDriver, ResourceId id)
 {
-  if (m_current_framedata != NULL)
+  if (m_CurrentFrameData != NULL)
   {
-    buffers.insert(id);
+    m_TmpBuffers.insert(id);
   }
 }
 
 void GLDump::CacheTextureMemory(WrappedOpenGL *m_pDriver, ResourceId id, GLenum target, GLsizei levels,
                                         GLenum internalformat, GLsizei width, GLsizei height, GLsizei depth)
 {
-  if (textureUsage.find(id) == textureUsage.end())
+  if (m_CacheTextures.find(id) == m_CacheTextures.end())
   {
     size_t texSize = CalcTextureMemory(width, height, depth, internalformat, levels);
     // RDCLOG("resourceId %d, levels %d, width %d, height %d, depth %d, texSize %d", id.id, levels, width, height, depth, texSize);
-    textureUsage.insert(std::pair<ResourceId, size_t>(id, texSize));
+    m_CacheTextures.insert(std::pair<ResourceId, size_t>(id, texSize));
   }
 }
 
 void GLDump::CacheBufferTextureMemory(WrappedOpenGL *m_pDriver, ResourceId id, ResourceId bufid)
 {
-  if (textureUsage.find(id) == textureUsage.end())
+  if (m_CacheTextures.find(id) == m_CacheTextures.end())
   {
     size_t bufsize = 0;
-    if (bufferUsage.find(bufid) != bufferUsage.end())
+    if (m_CacheBuffers.find(bufid) != m_CacheBuffers.end())
     {
-      bufsize = bufferUsage[bufid];
+      bufsize = m_CacheBuffers[bufid];
     }
-    textureUsage.insert(std::pair<ResourceId, size_t>(id, bufsize));
+    m_CacheTextures.insert(std::pair<ResourceId, size_t>(id, bufsize));
   }
 }
 
 void GLDump::CacheBufferMemory(WrappedOpenGL *m_pDriver, ResourceId id, GLsizeiptr size)
 {
-  if (bufferUsage.find(id) == bufferUsage.end())
+  if (m_CacheBuffers.find(id) == m_CacheBuffers.end())
   {
-    bufferUsage.insert(std::pair<ResourceId, size_t>(id, size));
+    m_CacheBuffers.insert(std::pair<ResourceId, size_t>(id, size));
   }
 }
 
 size_t GLDump::CalcTextureTotalMemory()
 {
   size_t ret = 0;
-  RDCLOG("CalcTextureTotalMemory Start");
-  for (ResourceId id : textures)
+  for (ResourceId id : m_TmpTextures)
   {
-    size_t m = textureUsage[id];
-    ret += m;
-    RDCLOG("%s, size %d", ToStr(id).c_str(), m);
+    ret += m_CacheTextures[id];
   }
-  RDCLOG("CalcTextureTotalMemory End");
   return ret;
 }
 
 size_t GLDump::CalcBufferTotalMemory()
 {
   size_t ret = 0;
-  RDCLOG("CalcBufferTotalMemory Start");
-  for (ResourceId id : buffers)
+  for (ResourceId id : m_TmpBuffers)
   {
-    size_t m = bufferUsage[id];
-    ret += m;
-    RDCLOG("%s, size %d", ToStr(id).c_str(), m);
+    ret += m_CacheBuffers[id];
   }
-  RDCLOG("CalcBufferTotalMemory End");
   return ret;
 }
 
@@ -161,22 +153,23 @@ void GLDump::ResetFrameData(WrappedOpenGL *m_pDriver, size_t backbufferColorSize
 {
 //  if (m_current_frame == 0)
 //    StartDumper();
-  if (m_current_frame >= MAXFRAMES - 1)
+  if (m_CurrentFrame >= MAXFRAMES - 1)
     return;
-  if (m_current_frame >= 0)
+  if (m_CurrentFrame > 0)
   {
-    m_current_framedata->texture_count = textures.size();
-    m_current_framedata->texture_size = CalcTextureTotalMemory() + (backbufferColorSize * 4);
-    RDCLOG("frame %d, drawcall %d, textures %d, CountTextureTotalMemory %.2f MB, CalcBufferTotalMemory %.2f MB", m_current_frame, m_current_framedata->drawcall_count, m_current_framedata->texture_count, (float)m_current_framedata->texture_size / (1024.0f * 1024.0f), (float)CalcBufferTotalMemory() / (1024.0f * 1024.0f));
-    if ((m_current_frame % 500) == 0)
+    m_CurrentFrameData->texture_count = m_TmpTextures.size();
+    m_CurrentFrameData->texture_size = CalcTextureTotalMemory() + (backbufferColorSize * 4);
+    RDCLOG("frame %d, drawcall %d, textures %d, CountTextureTotalMemory %.2f MB, CalcBufferTotalMemory %.2f MB", m_CurrentFrame, m_CurrentFrameData->drawcall_count, m_CurrentFrameData->texture_count, (float)m_CurrentFrameData->texture_size / (1024.0f * 1024.0f), (float)CalcBufferTotalMemory() / (1024.0f * 1024.0f));
+    if ((m_CurrentFrame % 500) == 0)
     {
-      data2serialize = m_current_frame;
+      data2serialize = m_CurrentFrame;
     }
   }
-  m_current_frame++;
-  m_current_framedata = &m_framedatas[m_current_frame];
-  textures.clear();
-  buffers.clear();
+  m_CurrentFrame++;
+  //m_CurrentFrameData = &m_framedatas[m_CurrentFrame];
+  m_CurrentFrameData = m_FrameDatas->enqueueRef();
+  m_TmpTextures.clear();
+  m_TmpBuffers.clear();
 }
 
 size_t GLDump::CalcTextureMemory(GLsizei w, GLsizei h, GLsizei d, GLenum internalformat, uint32_t levels)

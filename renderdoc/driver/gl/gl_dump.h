@@ -59,7 +59,7 @@ public:
   {
     if (isEmpty())
     {
-      return NULL;
+      return T();
     }
     T ret = buffer[front];
     front = (front + 1) % capacity;
@@ -71,7 +71,7 @@ public:
   {
     if (isEmpty())
     {
-      return NULL;
+      return T();
     }
     return buffer[front];
   }
@@ -88,16 +88,17 @@ public:
 
   int size()
   {
-    return size();
+    return count;
   }
 };
 
-#define MAXFRAMES 1048576
+#define MAXFRAMES 3000
 
 class GLDump
 {
   typedef struct 
   {
+    size_t frame;
     size_t drawcall_count;
     size_t texture_count;
     size_t texture_size;
@@ -164,9 +165,5 @@ private:
   std::set<ResourceId> m_TmpTextures;
   std::set<ResourceId> m_TmpBuffers;
 
-
-  
-  FrameData m_framedatas[MAXFRAMES];
-  size_t data2serialize = 0;
 
 };

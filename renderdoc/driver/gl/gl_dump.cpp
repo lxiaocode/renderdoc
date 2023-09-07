@@ -1,6 +1,7 @@
 ﻿#include "precompiled.h"
 #include "gl_dump.h"
-#include <vector>
+#include <chrono>
+#include <sstream>
 
 #include "gl_replay.h"
 
@@ -17,9 +18,13 @@ GLDump *GLDump::Ints()
 
 void GLDump::Dumper()
 {
-  rdcstr dumpFile = FileIO::GetAppFolderFilename("renderdoc.txt");
+  auto now = std::chrono::system_clock::now();
+  auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
+  std::stringstream filename;
+  filename << "RenderdocDumper-" << ms << ".txt";
+  
+  rdcstr dumpFile = FileIO::GetAppFolderFilename(filename.str().c_str());
   std::ofstream file(dumpFile.c_str(), std::ios::app);
-  int serialized = 0;
   if (!file.is_open())
   {
     RDCLOG("%s is not open.", dumpFile.c_str());
@@ -29,21 +34,22 @@ void GLDump::Dumper()
   while (true)
   {
     std::this_thread::sleep_for(std::chrono::seconds(1));
-      
-    int d2s = data2serialize;
-    RDCLOG("data2serialize %d", d2s);
-    RDCLOG("GLDump::Inst().data2serialize %d", data2serialize);
-    RDCLOG("dump = %p", this);
-    if (d2s > serialized)
+    RDCLOG("Waiting for serizlization %d", m_FrameDatas->size());
+    if (m_FrameDatas->size() > 300)
     {
-      for (; serialized < d2s; serialized++)
+      for (int i = 0; i < 300; i++)
       {
-        file << m_framedatas[serialized].drawcall_count << " ";
+        FrameData data = m_FrameDatas->dequeue();
+        file << data.frame << ",";
+        file << data.drawcall_count << ",";
+        file << data.texture_count << ",";
+        file << data.texture_size << ",";
+        file << data.buffer_count << ",";
+        file << data.buffer_size << "\n";
       }
-      file << std::endl;
       //std::cout << std::endl;
       file.flush();
-      RDCLOG("flush %d", serialized);
+      RDCLOG("flush %d", m_FrameDatas->getFront().frame);
     }
   }
 }
@@ -151,19 +157,18 @@ size_t GLDump::CalcBufferTotalMemory()
 
 void GLDump::ResetFrameData(WrappedOpenGL *m_pDriver, size_t backbufferColorSize)
 {
-//  if (m_current_frame == 0)
-//    StartDumper();
+  if (m_CurrentFrame == 0)
+    StartDumper();
   if (m_CurrentFrame >= MAXFRAMES - 1)
     return;
   if (m_CurrentFrame > 0)
   {
-    m_CurrentFrameData->texture_count = m_TmpTextures.size();
+    m_CurrentFrameData->frame = m_CurrentFrame;
+    m_CurrentFrameData->texture_count = m_TmpTextures.size() + 1;
     m_CurrentFrameData->texture_size = CalcTextureTotalMemory() + (backbufferColorSize * 4);
-    RDCLOG("frame %d, drawcall %d, textures %d, CountTextureTotalMemory %.2f MB, CalcBufferTotalMemory %.2f MB", m_CurrentFrame, m_CurrentFrameData->drawcall_count, m_CurrentFrameData->texture_count, (float)m_CurrentFrameData->texture_size / (1024.0f * 1024.0f), (float)CalcBufferTotalMemory() / (1024.0f * 1024.0f));
-    if ((m_CurrentFrame % 500) == 0)
-    {
-      data2serialize = m_CurrentFrame;
-    }
+    m_CurrentFrameData->buffer_count = m_TmpBuffers.size();
+    m_CurrentFrameData->buffer_size = CalcBufferTotalMemory();
+    RDCLOG("frame %d, drawcall %d, textures %d, CountTextureTotalMemory %.2f MB, buffers %d, CalcBufferTotalMemory %.2f MB", m_CurrentFrame, m_CurrentFrameData->drawcall_count, m_CurrentFrameData->texture_count, (float)m_CurrentFrameData->texture_size / (1024.0f * 1024.0f), m_CurrentFrameData->buffer_count, (float)m_CurrentFrameData->buffer_size / (1024.0f * 1024.0f));
   }
   m_CurrentFrame++;
   //m_CurrentFrameData = &m_framedatas[m_CurrentFrame];

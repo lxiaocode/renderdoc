@@ -163,7 +163,7 @@ size_t GLDump::CalcBufferTotalMemory()
   return ret;
 }
 
-void GLDump::ResetFrameData(WrappedOpenGL *m_pDriver, size_t backbufferColorSize)
+void GLDump::ResetFrameData(WrappedOpenGL *m_pDriver, size_t backbufferSize)
 {
   if (m_CurrentFrame == 0)
     StartDumper();
@@ -172,8 +172,8 @@ void GLDump::ResetFrameData(WrappedOpenGL *m_pDriver, size_t backbufferColorSize
   if (m_CurrentFrame > 0)
   {
     m_CurrentFrameData->frame = m_CurrentFrame;
-    m_CurrentFrameData->texture_count = m_TmpTextures.size() + 1;
-    m_CurrentFrameData->texture_size = CalcTextureTotalMemory() + (backbufferColorSize * 4);
+    m_CurrentFrameData->texture_count = m_TmpTextures.size();
+    m_CurrentFrameData->texture_size = CalcTextureTotalMemory() + backbufferSize;
     m_CurrentFrameData->buffer_count = m_TmpBuffers.size();
     m_CurrentFrameData->buffer_size = CalcBufferTotalMemory();
     RDCLOG("frame %d, drawcall %d, textures %d, CountTextureTotalMemory %.2f MB, buffers %d, CalcBufferTotalMemory %.2f MB", m_CurrentFrame, m_CurrentFrameData->drawcall_count, m_CurrentFrameData->texture_count, (float)m_CurrentFrameData->texture_size / (1024.0f * 1024.0f), m_CurrentFrameData->buffer_count, (float)m_CurrentFrameData->buffer_size / (1024.0f * 1024.0f));

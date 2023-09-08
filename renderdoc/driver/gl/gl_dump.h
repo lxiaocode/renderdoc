@@ -155,7 +155,7 @@ public:
   size_t CalcBufferTotalMemory();
 
   
-  void ResetFrameData(WrappedOpenGL *m_pDriver, size_t backbufferColorSize);
+  void ResetFrameData(WrappedOpenGL *m_pDriver, size_t backbufferSize);
   
 private:
   GLDump();

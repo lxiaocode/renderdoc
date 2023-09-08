@@ -2017,7 +2017,16 @@ void WrappedOpenGL::SwapBuffers(WindowingSystem winSystem, void *windowHandle)
   m_FrameCounter++;    // first present becomes frame #1, this function is at the end of the frame
 
   ContextData &ctxdata = GetCtxData();
-  GLDump::Ints()->ResetFrameData(this, ctxdata.initParams.width * ctxdata.initParams.height);
+  size_t backbufferSize = 0;
+  // Backbuffer Color
+  if (ctxdata.initParams.colorBits == 0)
+    backbufferSize += 4;
+  else
+    backbufferSize += (ctxdata.initParams.colorBits / 8);
+  // Backbuffer Depth-Stencil
+  if (ctxdata.initParams.depthBits + ctxdata.initParams.stencilBits != 0)
+    backbufferSize += (ctxdata.initParams.depthBits + ctxdata.initParams.stencilBits) / 8;
+  GLDump::Ints()->ResetFrameData(this, (ctxdata.initParams.width * ctxdata.initParams.height) * backbufferSize);
 
   // we only handle context-window associations here as it's too common to
   // create invisible helper windows while creating contexts, that then

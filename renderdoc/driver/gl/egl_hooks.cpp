@@ -1039,7 +1039,7 @@ bool ShouldHookEGL()
 {
   void *egl_handle = dlopen("libEGL.so", RTLD_LAZY);
   PFN_eglQueryString query_string = (PFN_eglQueryString)dlsym(egl_handle, "eglQueryString");
-  if(!query_string)
+  //if(!query_string)
   {
     RDCERR("Unable to find eglQueryString entry point, enabling EGL hooking");
     return true;

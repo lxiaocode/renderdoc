@@ -4597,9 +4597,9 @@ void WrappedOpenGL::glTexStorage1D(GLenum target, GLsizei levels, GLenum interna
   }
   else if(!IsProxyTarget(target))
   {
-    GLResourceRecord *record = GetCtxData().GetActiveTexRecord(target);
-    if(record != NULL)
-      Common_glTextureStorage1DEXT(record->GetResourceID(), target, levels, internalformat, width);
+    GLResourceRecord *record1 = GetCtxData().GetActiveTexRecord(target);
+    if(record1 != NULL)
+      Common_glTextureStorage1DEXT(record1->GetResourceID(), target, levels, internalformat, width);
     else
       RDCERR("Calling non-DSA texture function with no texture bound to active slot");
   }
@@ -4728,9 +4728,9 @@ void WrappedOpenGL::glTexStorage2D(GLenum target, GLsizei levels, GLenum interna
   }
   else if(!IsProxyTarget(target))
   {
-    GLResourceRecord *record = GetCtxData().GetActiveTexRecord(target);
-    if(record != NULL)
-      Common_glTextureStorage2DEXT(record->GetResourceID(), target, levels, internalformat, width,
+    GLResourceRecord *record1 = GetCtxData().GetActiveTexRecord(target);
+    if(record1 != NULL)
+      Common_glTextureStorage2DEXT(record1->GetResourceID(), target, levels, internalformat, width,
                                    height);
     else
       RDCERR("Calling non-DSA texture function with no texture bound to active slot");
@@ -4863,9 +4863,9 @@ void WrappedOpenGL::glTexStorage3D(GLenum target, GLsizei levels, GLenum interna
   }
   else if(!IsProxyTarget(target))
   {
-    GLResourceRecord *record = GetCtxData().GetActiveTexRecord(target);
-    if(record != NULL)
-      Common_glTextureStorage3DEXT(record->GetResourceID(), target, levels, internalformat, width,
+    GLResourceRecord *record1 = GetCtxData().GetActiveTexRecord(target);
+    if(record1 != NULL)
+      Common_glTextureStorage3DEXT(record1->GetResourceID(), target, levels, internalformat, width,
                                    height, depth);
     else
       RDCERR("Calling non-DSA texture function with no texture bound to active slot");
@@ -7020,9 +7020,9 @@ void WrappedOpenGL::glTexBuffer(GLenum target, GLenum internalformat, GLuint buf
   }
   else if(!IsProxyTarget(target))
   {
-    GLResourceRecord *record = GetCtxData().GetActiveTexRecord(target);
-    if(record != NULL)
-      Common_glTextureBufferEXT(record->GetResourceID(), target, internalformat, buffer);
+    GLResourceRecord *record1 = GetCtxData().GetActiveTexRecord(target);
+    if(record1 != NULL)
+      Common_glTextureBufferEXT(record1->GetResourceID(), target, internalformat, buffer);
     else
       RDCERR("Calling non-DSA texture function with no texture bound to active slot");
   }

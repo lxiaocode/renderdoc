@@ -1986,7 +1986,7 @@ GLenum TextureBinding(GLenum target)
     default: break;
   }
 
-  RDCERR("Unexpected target %s", ToStr(target).c_str());
+  //RDCERR("Unexpected target %s", ToStr(target).c_str());
   return eGL_NONE;
 }
 
@@ -2012,7 +2012,7 @@ GLenum BufferBinding(GLenum target)
     default: break;
   }
 
-  RDCERR("Unexpected target %s", ToStr(target).c_str());
+  //RDCERR("Unexpected target %s", ToStr(target).c_str());
   return eGL_NONE;
 }
 
@@ -2026,7 +2026,7 @@ GLenum FramebufferBinding(GLenum target)
     default: break;
   }
 
-  RDCERR("Unexpected target %s", ToStr(target).c_str());
+  //RDCERR("Unexpected target %s", ToStr(target).c_str());
   return eGL_NONE;
 }
 

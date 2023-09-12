@@ -43,9 +43,7 @@ void GLDump::Dumper()
         file << data.frame << ",";
         file << data.drawcall_count << ",";
         file << data.texture_count << ",";
-        file << data.texture_size << ",";
-        file << data.buffer_count << ",";
-        file << data.buffer_size << "\n";
+        file << data.texture_size << "\n";
       }
       //std::cout << std::endl;
       file.flush();
@@ -143,13 +141,10 @@ void GLDump::CacheBufferMemory(WrappedOpenGL *m_pDriver, ResourceId id, GLsizeip
 size_t GLDump::CalcTextureTotalMemory()
 {
   size_t ret = 0;
-  //RDCLOG("CalcTextureTotalMemory Start");
   for (ResourceId id : m_TmpTextures)
   {
     ret += m_CacheTextures[id];
-    //RDCLOG("%s : %d", ToStr(id).c_str(), m_CacheTextures[id]);
   }
-  //RDCLOG("CalcTextureTotalMemory End");
   return ret;
 }
 
@@ -163,7 +158,7 @@ size_t GLDump::CalcBufferTotalMemory()
   return ret;
 }
 
-void GLDump::ResetFrameData(WrappedOpenGL *m_pDriver, size_t backbufferSize)
+void GLDump::ResetFrameData(WrappedOpenGL *m_pDriver, size_t backbufferColorSize, size_t backbufferDepthStencilSize)
 {
   if (m_CurrentFrame == 0)
     StartDumper();
@@ -173,13 +168,18 @@ void GLDump::ResetFrameData(WrappedOpenGL *m_pDriver, size_t backbufferSize)
   {
     m_CurrentFrameData->frame = m_CurrentFrame;
     m_CurrentFrameData->texture_count = m_TmpTextures.size();
-    m_CurrentFrameData->texture_size = CalcTextureTotalMemory() + backbufferSize;
+    m_CurrentFrameData->texture_size = CalcTextureTotalMemory() + backbufferColorSize + backbufferDepthStencilSize;
     m_CurrentFrameData->buffer_count = m_TmpBuffers.size();
     m_CurrentFrameData->buffer_size = CalcBufferTotalMemory();
     RDCLOG("frame %d, drawcall %d, textures %d, CountTextureTotalMemory %.2f MB, buffers %d, CalcBufferTotalMemory %.2f MB", m_CurrentFrame, m_CurrentFrameData->drawcall_count, m_CurrentFrameData->texture_count, (float)m_CurrentFrameData->texture_size / (1024.0f * 1024.0f), m_CurrentFrameData->buffer_count, (float)m_CurrentFrameData->buffer_size / (1024.0f * 1024.0f));
+    if (m_IsCapture)
+    {
+      m_DebugTextures = m_TmpTextures;
+      debugThread = std::thread(&GLDump::DebugLog, this);
+      m_IsCapture = 0;
+    }
   }
   m_CurrentFrame++;
-  //m_CurrentFrameData = &m_framedatas[m_CurrentFrame];
   m_CurrentFrameData = m_FrameDatas->enqueueRef();
   m_CurrentFrameData->Reset();
   m_TmpTextures.clear();
@@ -195,4 +195,25 @@ size_t GLDump::CalcTextureMemory(GLsizei w, GLsizei h, GLsizei d, GLenum interna
   }
 
   return byteSize;
+}
+
+void GLDump::SetCaptureState()
+{
+  m_IsCapture = 1;
+}
+
+void GLDump::DebugLog()
+{
+  DebugLogTextures();
+}
+
+
+void GLDump::DebugLogTextures()
+{
+  RDCLOG("DebugLogTextures Start");
+  for (ResourceId id : m_DebugTextures)
+  {
+    RDCLOG("%s, %d", ToStr(id).c_str(), m_CacheTextures[id]);
+  }
+  RDCLOG("DebugLogTextures End");
 }

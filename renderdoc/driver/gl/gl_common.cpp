@@ -1354,10 +1354,12 @@ size_t TextureIdx(GLenum buf)
     case eGL_TEXTURE_CUBE_MAP_NEGATIVE_Z: return 8;
     case eGL_TEXTURE_CUBE_MAP_ARRAY: return 9;
     case eGL_TEXTURE_BUFFER: return 10;
-    default: RDCERR("Unexpected enum as texture target: %s", ToStr(buf).c_str());
+    //default: RDCERR("Unexpected enum as texture target: %s", ToStr(buf).c_str());
+    default:
+      return 0;
   }
 
-  return 0;
+  //return 0;
 }
 
 GLenum TextureEnum(size_t idx)

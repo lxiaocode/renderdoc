@@ -155,14 +155,25 @@ public:
   size_t CalcBufferTotalMemory();
 
   
-  void ResetFrameData(WrappedOpenGL *m_pDriver, size_t backbufferSize);
+  void ResetFrameData(WrappedOpenGL *m_pDriver, size_t backbufferColorSize, size_t backbufferDepthStencilSize);
+
+  // =========================================================
+  // Debug
+  // =========================================================
+  void SetCaptureState();
+  void DebugLog();
+  void DebugLogTextures();
   
 private:
   GLDump();
   virtual ~GLDump() {}
   std::thread writerThread;
+  std::thread debugThread;
+  std::set<ResourceId> m_DebugTextures;
 
 private:
+  int m_IsCapture = 0;
+  
   size_t m_CurrentFrame = 0;
   CircularQueue<FrameData> *m_FrameDatas = new CircularQueue<FrameData>(MAXFRAMES);
 
